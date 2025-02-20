@@ -1,6 +1,6 @@
 # https://khromov.se/dockerizing-your-sveltekit-applications-a-practical-guide
 
-FROM --platform=linux/amd64/v8 node:22-alpine AS builder
+FROM node:22-alpine AS builder
 WORKDIR /
 COPY package*.json ./
 RUN npm ci
@@ -13,6 +13,7 @@ WORKDIR /
 COPY --from=builder /build build/
 COPY --from=builder /node_modules node_modules/
 COPY package.json .
-EXPOSE 80
+COPY .env .
+EXPOSE 3000
 ENV NODE_ENV=production
-CMD [ "node", "build" ]
+CMD [ "node", "-r", "dotenv/config", "build" ]
