@@ -7,6 +7,19 @@
 		%sveltekit.head%
 	</head>
 	<body data-sveltekit-preload-data="hover">
-		<div style="display: contents">%sveltekit.body%</div>
+				<style>
+					/* Reset defaults to avoid unwanted scrollbars */
+					:root { box-sizing: border-box; }
+					*, *::before, *::after { box-sizing: inherit; }
+						html, body { height: 100%; margin: 0; overflow: hidden; }
+
+					/* Layout helper: make app a column so footer can be pushed to bottom */
+						.app-root { display: flex; flex-direction: column; height: 100dvh; }
+						.app-root > nav,
+						.app-root > footer { flex: 0 0 auto; }
+						.app-root > *:not(nav):not(footer) { flex: 1 1 0; min-height: 0; }
+				</style>
+
+		<div class="app-root">%sveltekit.body%</div>
 	</body>
 </html>

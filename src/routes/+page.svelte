@@ -1,15 +1,11 @@
 <script>
 	import Nav from './Nav.svelte';
+	import Footer from './Footer.svelte';
+	import Hero from './Hero.svelte';
 </script>
 
 <Nav />
 
-<h1>Soon™</h1>
+<Hero />
 
-<style>
-  h1 {
-	font-family: sans-serif;
-	font-size: 2em;
-	text-align: center;
-  }
-</style>
+<Footer />
