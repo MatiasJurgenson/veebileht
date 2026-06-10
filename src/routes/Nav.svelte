@@ -10,7 +10,7 @@
 <nav class="navbar">
   <div class="nav-inner">
     <div class="left">
-      <img src="/fox.png" alt="Logo" width="30" height="30" />
+      <a href="/fox"><img src="/fox.png" alt="Logo" width="30" height="30" /></a>
       <div class="nav-links">
         <a href="/">{ $locale === 'en' ? labels.en.home : labels.et.home }</a>
         <a href="/projects">{ $locale === 'en' ? labels.en.projects : labels.et.projects }</a>
