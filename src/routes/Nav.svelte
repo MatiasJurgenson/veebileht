@@ -15,6 +15,7 @@
         <a href="/">{ $locale === 'en' ? labels.en.home : labels.et.home }</a>
         <a href="/projects">{ $locale === 'en' ? labels.en.projects : labels.et.projects }</a>
         <a href="/other">{ $locale === 'en' ? labels.en.other : labels.et.other }</a>
+        <a href="https://scrabble.matias.ee">Scrabble</a>
       </div>
     </div>
 
