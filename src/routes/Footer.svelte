@@ -12,6 +12,7 @@
     <p>{ $locale === 'en' ? text.en : text.et }</p>
 
     <ul class="social">
+      <li>jurgenson.matias@gmail.com</li>
       <li><a href="https://github.com/MatiasJurgenson" target="_blank" rel="noopener noreferrer"><img src="/github.svg" alt="GitHub" width="24" height="24" /></a></li>
       <li><a href="https://www.linkedin.com/in/matias-j%C3%BCrgenson-8147aa28b/" target="_blank" rel="noopener noreferrer"><img src="/linkedin.svg" alt="LinkedIn" width="24" height="24" /></a></li>
     </ul>

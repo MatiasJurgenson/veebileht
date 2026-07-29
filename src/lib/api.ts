@@ -94,6 +94,30 @@ export interface Article extends ArticleBase {
 	localizations: ArticleBase[];
 }
 
+// all the API functions
+export const SECTION_CONFIG = {
+	fox: {
+		apiSlug: 'fox',
+		title: 'Svelte and Strapi Integration'
+	},
+	other: {
+		apiSlug: 'other',
+		title: 'Other'
+	},
+	projects: {
+		apiSlug: 'project',
+		title: 'Projects'
+	}
+} as const;
+
+
+// check if a given section slug is valid
+export type SectionSlug = keyof typeof SECTION_CONFIG;
+
+export function isSectionSlug(section: string): section is SectionSlug {
+	return section in SECTION_CONFIG;
+}
+
 const ARTICLES_URL = 'https://cms.matias.ee/api/articles?populate=*';
 
 // fetch all articles from the API
@@ -105,13 +129,35 @@ export async function fetchArticles(fetcher: typeof fetch): Promise<Article[]> {
 }
 
 // fetch a single article by its ID or slug
-export async function fetchArticle(fetcher: typeof fetch, id: string): Promise<Article> {
+export async function fetchArticle(fetcher: typeof fetch, id: string, categorySlug?: string): Promise<Article> {
 	const articles = await fetchArticles(fetcher);
-	const article = articles.find((entry) => entry.slug === id || String(entry.id) === id);
+	const article = articles.find((entry) => {
+		const matchesArticle = entry.slug === id || String(entry.id) === id;
+		const matchesCategory = !categorySlug || entry.category.slug === categorySlug;
+
+		return matchesArticle && matchesCategory;
+	});
 
 	if (!article) {
 		throw error(404, 'Article not found');
 	}
 
 	return article;
+}
+
+// fetch all articles for a specific section
+export async function fetchSectionArticles(fetcher: typeof fetch, section: SectionSlug): Promise<Article[]> {
+	return fetchSlugArticles(fetcher, SECTION_CONFIG[section].apiSlug);
+}
+
+// fetch a single article for a specific section
+export async function fetchSectionArticle(fetcher: typeof fetch, section: SectionSlug, id: string): Promise<Article> {
+	return fetchArticle(fetcher, id, SECTION_CONFIG[section].apiSlug);
+}
+
+// fetch all articles for a specific slug
+export async function fetchSlugArticles(fetcher: typeof fetch, slug: string): Promise<Article[]> {
+    const articles = await fetchArticles(fetcher);
+
+    return articles.filter((article) => article.category.slug === slug);
 }
