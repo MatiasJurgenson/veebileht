@@ -9,6 +9,9 @@
 		"skipLibCheck": true,
 		"sourceMap": true,
 		"strict": true,
+		// Prevent TypeScript from automatically including ambient type libs like 'node'
+		// when they're not installed in the project. Leave empty to opt out.
+		"types": [],
 		"moduleResolution": "bundler"
 	}
 	// Path aliases are handled by https://svelte.dev/docs/kit/configuration#alias

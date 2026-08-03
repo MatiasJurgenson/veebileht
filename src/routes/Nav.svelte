@@ -5,6 +5,10 @@
     en: { home: 'Home', projects: 'Projects', other: 'Other'},
     et: { home: 'Avaleht', projects: 'Projektid', other: 'Muu' }
   };
+
+	function switchLocale() {
+		locale.set($locale === 'en' ? 'et' : 'en');
+	}
 </script>
 
 <nav class="navbar">
@@ -24,7 +28,7 @@
         { $theme === 'light' ? '🌙' : '☀️' }
       </button>
 
-      <button class="theme-toggle" on:click={() => locale.set($locale === 'en' ? 'et' : 'en')} aria-label="Toggle language">
+      <button class="theme-toggle" on:click={switchLocale} aria-label="Toggle language">
         { $locale === 'en' ? 'EE' : 'EN' }
       </button>
     </div>
@@ -81,5 +85,18 @@
     padding: 6px 8px;
     border-radius: 6px;
     cursor: pointer;
+  }
+
+  @media (max-width: 760px) {
+    .nav-inner {
+      max-width: 100%;
+      flex-direction: column;
+      align-items: flex-start;
+    }
+
+    .left .nav-links {
+      justify-content: flex-start;
+      align-items: flex-start;
+    }
   }
 </style>

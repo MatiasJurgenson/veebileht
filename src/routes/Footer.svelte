@@ -42,4 +42,17 @@
   }
 
   .social img { display: block; }
+
+  @media (max-width: 760px) {
+    .footer-inner {
+      max-width: 100%;
+      flex-direction: column;
+      align-items: flex-start;
+    }
+
+    .social {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+  }
 </style>

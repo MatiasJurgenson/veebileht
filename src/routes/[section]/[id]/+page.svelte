@@ -3,7 +3,7 @@
 	import Footer from '../../Footer.svelte';
 
 	import { locale } from '$lib/settings';
-	import type { Article, RichTextNode } from '$lib/api';
+	import type { Article, MediaAsset, RichTextNode } from '$lib/api';
 
 	let { data }: { data: { section: string; article: Article } } = $props();
 
@@ -48,20 +48,48 @@
 		return [data.article, ...data.article.localizations].find((article) => article.locale === selectedLocale) ?? data.article;
 	}
 
-	// selectedArticle: for `projects` prefer localized fields but fall back
-	// to the default article's `cover` and `media` when missing.
-	const selectedArticle = $derived.by(() => {
-		if (data.section === 'projects') {
-			const localeArticle = getArticleByLocale($locale);
-			return {
-				...data.article,
-				...localeArticle,
-				cover: localeArticle.cover ?? data.article.cover,
-				media: (localeArticle.media && localeArticle.media.length) ? localeArticle.media : data.article.media
-			};
+	const CMS_BASE_URL = 'https://cms.matias.ee';
+	let selectedImageIndex = $state(0);
+
+	function imageAlt(image: MediaAsset): string {
+		return image.alternativeText ?? image.caption ?? selectedArticle.title;
+	}
+
+	function imageSrc(image: MediaAsset, size: 'full' | 'thumb' = 'full'): string {
+		if (size === 'thumb') {
+			const thumbUrl = image.formats.small?.url ?? image.formats.thumbnail?.url ?? image.url;
+
+			return `${CMS_BASE_URL}${thumbUrl}`;
 		}
 
-		return data.article;
+		return `${CMS_BASE_URL}${image.url}`;
+	}
+
+
+	// to the default article's `cover` and `media` when missing.
+	const selectedArticle = $derived.by(() => {
+		const localeArticle = getArticleByLocale($locale);
+
+		return {
+			...data.article,
+			...localeArticle,
+			cover: localeArticle.cover ?? data.article.cover,
+			media: (localeArticle.media && localeArticle.media.length) ? localeArticle.media : data.article.media
+		};
+	});
+
+	$effect(() => {
+		const imageCount = selectedArticle.media?.length ?? 0;
+
+		if (imageCount === 0) {
+			selectedImageIndex = 0;
+
+			return;
+		}
+
+		if (selectedImageIndex > imageCount - 1) {
+			selectedImageIndex = 0;
+		}
 	});
 </script>
 
@@ -69,72 +97,121 @@
 	<title>{selectedArticle.title}</title>
 </svelte:head>
 
-<article>
 
-	<Nav />
+<Nav />
 
-	{#if selectedArticle.cover}
-		<img
-			src={`https://cms.matias.ee${selectedArticle.cover.url}`}
-			alt={selectedArticle.cover.alternativeText ?? selectedArticle.title}
-		/>
-	{/if}
+<div class="article">
 
 	<h1>{selectedArticle.title}</h1>
-	<p>{selectedArticle.description}</p>
-	<p>{selectedArticle.category.name}</p>
-
-	{#if selectedArticle.media?.length}
-		<section class="gallery" aria-label="Image gallery">
-			{#each selectedArticle.media as image}
-				<figure>
-					<img
-						src={`https://cms.matias.ee${image.url}`}
-						alt={image.alternativeText ?? image.caption ?? selectedArticle.title}
-						loading="lazy"
-					/>
-					{#if image.caption}
-						<figcaption>{image.caption}</figcaption>
-					{/if}
-				</figure>
-			{/each}
-		</section>
-	{/if}
 
 	{#each selectedArticle.text as block}
 		<p>{@html renderBlock(block)}</p>
 	{/each}
 
-	<Footer />
-</article>
+	{#if selectedArticle.media?.length}
+		<section class="gallery" aria-label="Image gallery">
+			<figure class="gallery-main">
+				<img
+					src={imageSrc(selectedArticle.media[selectedImageIndex])}
+					alt={imageAlt(selectedArticle.media[selectedImageIndex])}
+					loading="eager"
+				/>
+				{#if selectedArticle.media[selectedImageIndex].caption}
+					<figcaption>{selectedArticle.media[selectedImageIndex].caption}</figcaption>
+				{/if}
+			</figure>
+
+			<div class="gallery-thumbs" role="list" aria-label="Gallery thumbnails">
+				{#each selectedArticle.media as image, index}
+					<button
+						type="button"
+						class:selected={index === selectedImageIndex}
+						onclick={() => (selectedImageIndex = index)}
+						aria-label={`Show image ${index + 1}`}
+						aria-pressed={index === selectedImageIndex}
+					>
+						<img
+							src={imageSrc(image, 'thumb')}
+							alt={imageAlt(image)}
+							loading="lazy"
+						/>
+					</button>
+				{/each}
+			</div>
+		</section>
+	{/if}
+
+</div>
+
+
+<Footer />
 
 <style>
-	article {
-		display: grid;
-		gap: 1rem;
+
+	.article {
+		max-width: 60%;
+		margin: 0 auto;
+		padding: 1rem 0;
 	}
 
 	.gallery {
-		display: grid;
-		grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-		gap: 0.75rem;
+		display: flex;
+		flex-direction: column;
+		gap: 0.85rem;
 		margin: 1rem 0;
 	}
 
-	.gallery figure {
+	.gallery-main {
 		margin: 0;
 	}
 
-	.gallery img {
+	.gallery-main img {
 		display: block;
 		width: 100%;
-		height: auto;
+		height: clamp(220px, 55vw, 560px);
+		object-fit: contain;
 		border-radius: 0.75rem;
 	}
 
-	.gallery figcaption {
+	.gallery-main figcaption {
 		margin-top: 0.35rem;
 		font-size: 0.9rem;
 		opacity: 0.8;
+	}
+
+	.gallery-thumbs {
+		display: grid;
+		grid-template-columns: repeat(auto-fit, minmax(92px, 1fr));
+		gap: 0.55rem;
+	}
+
+	.gallery-thumbs button {
+		padding: 0;
+		border: 2px solid transparent;
+		background: transparent;
+		border-radius: 0.6rem;
+		cursor: pointer;
+		overflow: hidden;
+	}
+
+	.gallery-thumbs button.selected {
+		border-color: hsl(198, 82%, 52%);
+	}
+
+	.gallery-thumbs img {
+		display: block;
+		width: 100%;
+		height: 84px;
+		object-fit: cover;
+	}
+
+	@media (max-width: 640px) {
+		.gallery-main img {
+			height: clamp(200px, 60vw, 420px);
+		}
+
+		.gallery-thumbs {
+			grid-template-columns: repeat(4, minmax(0, 1fr));
+		}
 	}
 </style>

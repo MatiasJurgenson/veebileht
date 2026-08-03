@@ -132,10 +132,11 @@ export async function fetchArticles(fetcher: typeof fetch): Promise<Article[]> {
 export async function fetchArticle(fetcher: typeof fetch, id: string, categorySlug?: string): Promise<Article> {
 	const articles = await fetchArticles(fetcher);
 	const article = articles.find((entry) => {
-		const matchesArticle = entry.slug === id || String(entry.id) === id;
 		const matchesCategory = !categorySlug || entry.category.slug === categorySlug;
+		const matchesBaseArticle = entry.slug === id || String(entry.id) === id;
+		const matchesLocalization = entry.localizations?.some((localization) => localization.slug === id || String(localization.id) === id);
 
-		return matchesArticle && matchesCategory;
+		return matchesCategory && (matchesBaseArticle || matchesLocalization);
 	});
 
 	if (!article) {

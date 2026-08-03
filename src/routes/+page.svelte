@@ -4,8 +4,23 @@
 	import Hero from './Hero.svelte';
 </script>
 
-<Nav />
+<main class="home-page">
+	<Nav />
+	<Hero />
+	<Footer />
+</main>
 
-<Hero />
+<style>
+	.home-page {
+		display: flex;
+		flex-direction: column;
+		flex: 1 1 auto;
+		height: 100dvh;
+		overflow: hidden;
+	}
 
-<Footer />
+	.home-page :global(.hero) {
+		flex: 1 1 auto;
+		min-height: 0;
+	}
+</style>

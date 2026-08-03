@@ -1,11 +1,15 @@
-//  the server reads that cookie
-
 <script lang="ts">
-	import { locale } from '$lib/settings';
+	import { locale, theme } from '$lib/settings';
 
 	let { data, children } = $props<{ data: { locale: 'en' | 'et' }; children: () => unknown }>();
 
-	locale.set(data.locale);
+	$effect(() => {
+		locale.set(data.locale);
+	});
+
+	$effect(() => {
+		document.documentElement.dataset.theme = $theme;
+	});
 </script>
 
 {@render children()}
