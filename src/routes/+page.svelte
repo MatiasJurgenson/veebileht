@@ -4,6 +4,14 @@
 	import Hero from './Hero.svelte';
 </script>
 
+<svelte:head>
+	<title>Home page</title>
+	<meta
+		name="description"
+		content="Personal website with projects, articles, and other information about Matias Jürgenson."
+	/>
+</svelte:head>
+
 <main class="home-page">
 	<Nav />
 	<Hero />

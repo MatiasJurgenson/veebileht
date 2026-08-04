@@ -95,6 +95,7 @@
 
 <svelte:head>
 	<title>{selectedArticle.title}</title>
+	<meta name="description" content={selectedArticle.description} />
 </svelte:head>
 
 

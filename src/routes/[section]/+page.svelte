@@ -16,6 +16,12 @@
 
 <svelte:head>
 	<title>{data.title}</title>
+	<meta
+		name="description"
+		content={data.section === 'projects'
+			? 'Projects I have done or have been involved in.'
+			: 'Other interesting information and articles.'}
+	/>
 </svelte:head>
 
 <main class="section-page">
